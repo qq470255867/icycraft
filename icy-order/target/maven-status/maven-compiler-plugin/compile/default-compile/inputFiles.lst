@@ -1,0 +1,7 @@
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\pojo\Order.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\service\OrderService.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\dao\JedisClientSingle.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\controller\OrderController.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\dao\JedisClientCluster.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\service\OrderServiceImpl.java
+D:\icycraft\taotao-order\src\main\java\com\taotao\order\dao\JedisClient.java

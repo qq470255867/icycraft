@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.icy.rest.mapper.ParentCatList">
+
+	<select id="getPcatList" resultType="com.icy.rest.pojo.NewParentCatList"
+		parameterType="java.lang.Long">
+		select
+		p.id Pid,
+		p.name PcatName
+		from
+		tb_item_cat p
+		LEFT JOIN tb_item_cat g on
+		p.parent_id = g.id
+		where g.id= #{GraId}
+
+	</select>
+</mapper>

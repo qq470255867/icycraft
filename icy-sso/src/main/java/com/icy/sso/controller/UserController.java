@@ -1,0 +1,154 @@
+package com.icy.sso.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.icy.sso.service.UserService;
+import com.icy.common.pojo.TaotaoResult;
+import com.icy.common.utils.ExceptionUtil;
+import com.icy.pojo.TbUser;
+
+@Controller
+@RequestMapping("/user")
+public class UserController {
+
+	@Autowired
+	UserService userService;
+
+	@RequestMapping("/check/{param}/{type}")
+	@ResponseBody
+	public Object registerCheck(@PathVariable String param, @PathVariable Integer type, String callback) {
+
+		TaotaoResult result = null;
+		if (StringUtils.isBlank(param)) {
+
+			result = TaotaoResult.build(400, "参数值不能为空");
+
+		}
+		if (type == null) {
+
+			result = TaotaoResult.build(400, "参数类型不能为空");
+
+		}
+		if (type != 1 && type != 2 && type != 3) {
+
+			result = TaotaoResult.build(400, "参数类型有误");
+
+		}
+		if (result != null) {
+			if (callback != null) {
+				MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+				mappingJacksonValue.setJsonpFunction(callback);
+				return mappingJacksonValue;
+			} else {
+				return result;
+			}
+
+		}
+		try {
+
+			result = userService.registerCheck(param, type);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (callback != null) {
+			MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+			mappingJacksonValue.setJsonpFunction(callback);
+			return mappingJacksonValue;
+		} else {
+			return result;
+		}
+	}
+
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	@ResponseBody
+	public TaotaoResult createUser(TbUser user) {
+
+		try {
+			TaotaoResult result = userService.createUser(user);
+
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return TaotaoResult.build(500, "用户创建失败");
+
+	}
+
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@ResponseBody
+	public TaotaoResult userLogin(String username, String password,HttpServletRequest request,HttpServletResponse response) {
+		try {
+			TaotaoResult result = userService.UserLogin(username, password, request, response);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return TaotaoResult.build(400, ExceptionUtil.getStackTrace(e));
+		}
+
+	}
+
+	@RequestMapping("/token/{token}")
+	@ResponseBody
+	public Object getUserByToken(@PathVariable String token, String callback) {
+
+		TaotaoResult result = null;
+
+		try {
+			result = userService.getUserByToken(token);
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			result = TaotaoResult.build(500, "异常已捕获");
+		}
+
+		if (StringUtils.isBlank(callback)) {
+
+			return result;
+
+		} else {
+			MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+
+			mappingJacksonValue.setJsonpFunction(callback);
+
+			return mappingJacksonValue;
+		}
+		
+
+	}
+	@RequestMapping("/logout/{token}")
+	@ResponseBody
+	public Object loginout(@PathVariable String token,String callback,HttpServletRequest request,HttpServletResponse response) {
+
+		
+		userService.UserLogout(token, request, response);
+		return TaotaoResult.ok();
+		
+	}
+	@RequestMapping("/showRegister")
+	public String showRegister(){
+	
+		return "register";
+		
+	}
+	@RequestMapping("/showLogin")
+	public String showLogin(String redirect,Model model){
+		
+		model.addAttribute("redirect",redirect);
+		
+		return "login";
+	}
+
+}
